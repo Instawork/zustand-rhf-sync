@@ -1,6 +1,6 @@
 {
   "name": "zustand-rhf-sync",
-  "version": "0.1.0",
+  "version": "0.0.2",
   "description": "Syncs the state of react-hook-form and zustand so that changes in one is updated in the other",
   "main": "index.js",
   "author": "lenwhite",
@@ -31,6 +31,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ts-jest": "^29.1.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.2.2"
   },
   "prettier": {

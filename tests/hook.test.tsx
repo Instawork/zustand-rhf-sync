@@ -361,7 +361,7 @@ describe("useSyncRHFWithStore with uncontrolled input", () => {
 
     await waitFor(() => {
       expect(useBoundStore.getState().arr).toHaveLength(1);
-      expect(useBoundStore.getState().arr[0].foo).toBe("foo-1");
+      expect(useBoundStore.getState().arr[0]?.foo).toBe("foo-1");
     });
   });
 
