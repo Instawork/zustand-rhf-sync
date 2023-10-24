@@ -42,10 +42,10 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
   setValueRef.current = setValue;
   triggerRef.current = trigger;
 
+  // syncs form to store
   useEffect(() => {
-    const unsubscribe = watch((data) => {
+    const formWatcher = watch((data) => {
       if (!mutex.current) {
-        // console.log("update from RHF", data, name, type);
         mutex.current = true;
         storeSetterRef.current({
           ...storeSelectorRef.current(useStore.getState()),
@@ -54,14 +54,13 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
         mutex.current = false;
       }
     });
-    return () => unsubscribe.unsubscribe();
+    return () => formWatcher.unsubscribe();
   }, [handleSubmit, useStore, watch]);
 
+  // syncs store to form
   useEffect(() => {
     return useStore.subscribe((state, prevState) => {
       if (!mutex.current) {
-        // console.log("update from zustand", state);
-
         mutex.current = true;
         deepCompareDifferences(
           state as Record<string, unknown>,
@@ -82,23 +81,6 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
             }
           },
         );
-
-        for (const key in storeSelectorRef.current(state)) {
-          setValueRef.current(
-            key as unknown as Path<F>,
-            storeSelectorRef.current(state)[key],
-            {
-              shouldDirty: true,
-              shouldTouch: true,
-              shouldValidate: true,
-            },
-          );
-          if (!isSubmittedRef.current && mode !== "onSubmit") {
-            triggerRef.current(key as unknown as Path<F>);
-          } else if (isSubmittedRef.current && reValidateMode !== "onSubmit") {
-            triggerRef.current(key as unknown as Path<F>);
-          }
-        }
         mutex.current = false;
       }
     });
