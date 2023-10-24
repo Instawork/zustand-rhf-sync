@@ -3,10 +3,8 @@
     "jsx": "react-jsx",
 
     "target": "esnext",
-    "types": [
-      "jest",
-      "@testing-library/jest-dom"
-    ],
+    "moduleResolution": "node",
+    "types": ["jest", "@testing-library/jest-dom"],
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
 
@@ -14,9 +12,8 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
-    "baseUrl": "./src",
+    "baseUrl": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
-
 }

@@ -2,13 +2,22 @@
   "name": "zustand-rhf-sync",
   "version": "0.0.2",
   "description": "Syncs the state of react-hook-form and zustand so that changes in one is updated in the other",
-  "main": "index.js",
   "author": "lenwhite",
   "license": "MIT",
   "dependencies": {
     "react-hook-form": "^7.45.2",
     "zustand": "^4.4.0"
   },
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lenwhite/zustand-rhf-sync.git"
+  },
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
@@ -51,6 +60,7 @@
   "scripts": {
     "test": "jest",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
-    "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'"
+    "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
+    "build": "tsup"
   }
 }

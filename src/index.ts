@@ -1,2 +1,2 @@
-import { useSyncRHFWithStore } from "./hook";
-export { useSyncRHFWithStore };
+import { useFormWithStore, useSyncRHFWithStore } from "./hook";
+export { useSyncRHFWithStore, useFormWithStore };
