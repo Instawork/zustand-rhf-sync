@@ -12,12 +12,12 @@ import { StoreApi, UseBoundStore } from "zustand";
 import { deepCloneWithoutFunctions, deepCompareDifferences } from "./utils";
 
 /**
- * Syncs a zustand store (or part of a zustand store) with react-hook-forms
+ * Syncs a zustand store (or part of a zustand store) with the form state in react-hook-forms
  *
  * @param useStore The zustand store that you're syncing with
- * @param useFormResult The return value of useForm from react-hook-form
  * @param storeSetter The setter function for the portion of the store that you're syncing with (similar to the handleSubmit function)
  * @param storeSelector The selector function for the portion of the store that you're syncing with (usually the defaultValues passed to useForm)
+ * @param useFormResult The return value of useForm from react-hook-form
  */
 export function useSyncRHFWithStore<T, F extends FieldValues>(
   useStore: UseBoundStore<StoreApi<T>>,
@@ -94,9 +94,9 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
             },
           );
           if (!isSubmittedRef.current && mode !== "onSubmit") {
-            triggerRef.current();
+            triggerRef.current(key as unknown as Path<F>);
           } else if (isSubmittedRef.current && reValidateMode !== "onSubmit") {
-            triggerRef.current();
+            triggerRef.current(key as unknown as Path<F>);
           }
         }
         mutex.current = false;
