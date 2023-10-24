@@ -381,27 +381,25 @@ describe("useSyncRHFWithStore with uncontrolled input", () => {
     expect(getByTestId("arr-1-foo-input")).toHaveValue("foo-1");
   });
 
-  it.failing(
-    "store changes to same value does not trigger rerender",
-    async () => {
-      const { getByTestId } = render(
-        <StrictMode>
-          <Counter />
-        </StrictMode>,
-      );
+  it("store changes to same value does not trigger rerender", async () => {
+    const { getByTestId } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>,
+    );
 
-      act(() => {
-        useBoundStore.setState({ count: 0 });
-        expect(getByTestId("render-count")).toHaveTextContent("1");
+    act(() => {
+      expect(getByTestId("render-count")).toHaveTextContent("3");
+      useBoundStore.setState({ count: 0 });
+      expect(getByTestId("render-count")).toHaveTextContent("3");
 
-        fireEvent.change(getByTestId("count-input"), {
-          target: { value: "0" },
-        });
-        expect(getByTestId("render-count")).toHaveTextContent("1");
-
-        useBoundStore.setState({ arr: [{ foo: "foo-0" }] });
-        expect(getByTestId("render-count")).toHaveTextContent("1");
+      fireEvent.change(getByTestId("count-input"), {
+        target: { value: "0" },
       });
-    },
-  );
+      expect(getByTestId("render-count")).toHaveTextContent("3");
+
+      useBoundStore.setState({ arr: [{ foo: "foo-0" }] });
+      expect(getByTestId("render-count")).toHaveTextContent("3");
+    });
+  });
 });

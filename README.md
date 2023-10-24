@@ -1,8 +1,21 @@
-Notes
+zustand-rhf-sync
 ---
 
-If you are using [immer](TODO:link) on the same store, you must use `setAutoFreeze(false)`
+Syncs zustand's store state with the form state in [react-hook-forms](react-hook-form.com). 
 
-### TODO
+This allows form updates to immediately reflect in your store and allows the components that subscribe to your store to update based on form updates. 
 
-- Auto exclude functions from store getter and setter
+## Install
+
+```bash
+npm install -save zustand-rhf-sync
+```
+
+Or with yarn 
+
+```bash
+yarn add zustand-rhf-sync
+```
+
+## Usage
+

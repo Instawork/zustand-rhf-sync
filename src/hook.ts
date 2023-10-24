@@ -2,8 +2,6 @@ import { useEffect, useRef } from "react";
 import {
   DefaultValues,
   FieldValues,
-  Path,
-  PathValue,
   UseFormProps,
   UseFormReturn,
   useForm,
@@ -62,25 +60,22 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
     return useStore.subscribe((state, prevState) => {
       if (!mutex.current) {
         mutex.current = true;
-        deepCompareDifferences(
-          state as Record<string, unknown>,
-          prevState as Record<string, unknown>,
-          (_path, newValue) => {
-            const path = _path as unknown as Path<F>;
-            setValueRef.current(path, newValue as PathValue<F, Path<F>>, {
-              shouldDirty: true,
-              shouldTouch: true,
-            });
-            if (!isSubmittedRef.current && mode !== "onSubmit") {
-              triggerRef.current(path);
-            } else if (
-              isSubmittedRef.current &&
-              reValidateMode !== "onSubmit"
-            ) {
-              triggerRef.current(path);
-            }
-          },
+        const changes = deepCompareDifferences(
+          storeSelectorRef.current(state),
+          storeSelectorRef.current(prevState),
         );
+        changes.forEach(([path, newValue]) => {
+          setValueRef.current(path, newValue, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          if (!isSubmittedRef.current && mode !== "onSubmit") {
+            triggerRef.current(path);
+          } else if (isSubmittedRef.current && reValidateMode !== "onSubmit") {
+            triggerRef.current(path);
+          }
+        });
         mutex.current = false;
       }
     });

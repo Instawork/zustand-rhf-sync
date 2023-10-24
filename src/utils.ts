@@ -1,6 +1,7 @@
+import { Path, PathValue } from "react-hook-form";
+
 /**
- * Deep compare two objects, and then calls a callback for each difference.
- * The callback is called with the path to the difference, and the new value.
+ * Deep compare two objects. Returns an array of [path, newValue] for each difference.
  *
  * This is used to update react-hook-form when the store changes.
  *
@@ -8,55 +9,70 @@
  *
  * @param state - The new state
  * @param prev - The previous state
- * @param callback - The callback to call for each difference
  * @param pathPrefix - The path prefix to use for the callback
- * @returns void
  */
-export function deepCompareDifferences<
-  T extends Record<string, unknown> | Array<unknown>,
->(
-  state: T,
-  prev: T,
-  callback: (path: string, newValue: unknown) => void,
-  pathPrefix = "",
-): void {
+function _deepCompareDifferences<
+  T extends Record<string, unknown> | Array<unknown> | unknown,
+>(state: T, prev: T, pathPrefix = ""): [string, unknown][] {
+  if (typeof state === "function") return [];
+  if (state === prev) return [];
   if (Array.isArray(state) && Array.isArray(prev)) {
+    const result: [string, unknown][] = [];
     if (state.length !== prev.length) {
-      callback(pathPrefix, state);
-      return;
-    }
-    for (let i = 0; i < state.length; i++) {
-      if (typeof state[i] === "object" && typeof prev[i] === "object") {
-        deepCompareDifferences(
-          state[i] as Record<string, unknown> | Array<unknown>,
-          prev[i] as Record<string, unknown> | Array<unknown>,
-          callback,
-          `${pathPrefix}[${i}].`,
+      result.push([pathPrefix, state]);
+    } else {
+      for (let i = 0; i < state.length; i++) {
+        result.push(
+          ..._deepCompareDifferences(
+            state[i] as Record<string, unknown> | Array<unknown>,
+            prev[i] as Record<string, unknown> | Array<unknown>,
+            `${pathPrefix ? `${pathPrefix}.` : ""}${i}`,
+          ),
         );
-      } else if (state[i] !== prev[i] && typeof state[i] !== "function") {
-        callback(`${pathPrefix}[${i}]`, state[i]);
       }
     }
-    return;
+    return result;
   }
 
   if (typeof state === "object" && typeof prev === "object") {
+    if (state === null || prev === null) {
+      return [[pathPrefix, state]];
+    }
+    const result: [string, unknown][] = [];
     for (const key in state) {
-      if (typeof state[key] === "object" && typeof prev[key] === "object") {
-        deepCompareDifferences(
+      result.push(
+        ..._deepCompareDifferences(
           state[key] as Record<string, unknown> | Array<unknown>,
           prev[key] as Record<string, unknown> | Array<unknown>,
-          callback,
-          `${pathPrefix}${key}.`,
-        );
-      } else if (state[key] !== prev[key] && typeof state[key] !== "function") {
-        callback(`${pathPrefix}${key}`, state[key]);
-      }
+          `${pathPrefix ? `${pathPrefix}.` : ""}${key}`,
+        ),
+      );
     }
-    return;
+    return result;
   }
 
-  callback(pathPrefix, state);
+  return [[pathPrefix, state]];
+}
+
+/**
+ * Deep compare two objects. Returns an array of [path, newValue] for each difference.
+ *
+ * This is used to update react-hook-form when the store changes.
+ *
+ * Function properties are ignored.
+ *
+ * @param state - The new state
+ * @param prev - The previous state
+ * @param pathPrefix - The path prefix to use for the callback
+ */
+export function deepCompareDifferences<T extends Record<string, unknown>>(
+  state: T,
+  prev: T,
+): [Path<T>, PathValue<T, Path<T>>][] {
+  return _deepCompareDifferences(state, prev) as [
+    Path<T>,
+    PathValue<T, Path<T>>,
+  ][];
 }
 
 export type RecursiveNonFunction<T> = T extends
