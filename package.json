@@ -1,19 +1,15 @@
 {
   "name": "zustand-rhf-sync",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Syncs the state of react-hook-form and zustand so that changes in one is updated in the other",
   "author": "lenwhite",
   "license": "MIT",
-  "dependencies": {
-    "react-hook-form": "^7.45.2",
-    "zustand": "^4.4.0"
-  },
   "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lenwhite/zustand-rhf-sync.git"
   },
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "package.json"
@@ -39,9 +35,11 @@
     "prettier": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.31.1",
     "ts-jest": "^29.1.1",
     "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "zustand": "^4.3.6"
   },
   "prettier": {
     "trailingComma": "all",
@@ -50,7 +48,9 @@
   },
   "peerDependencies": {
     "@types/react": ">=16.8",
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "react-hook-form": "^7.31.1",
+    "zustand": "^4.3.6"
   },
   "peerDependenciesMeta": {
     "@types/react": {

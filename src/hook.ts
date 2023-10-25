@@ -17,13 +17,19 @@ import { deepCloneWithoutFunctions, deepCompareDifferences } from "./utils";
  * @param storeSelector The selector function for the portion of the store that you're syncing with (usually the defaultValues passed to useForm)
  * @param useFormResult The return value of useForm from react-hook-form
  */
-export function useSyncRHFWithStore<T, F extends FieldValues>(
-  useStore: UseBoundStore<StoreApi<T>>,
-  storeSetter: (formValue: F) => void,
-  storeSelector: (state: T) => F,
-  { handleSubmit, watch, setValue, trigger, formState }: UseFormReturn<F>,
-  mode: UseFormProps<F>["mode"] = "onSubmit",
-  reValidateMode: UseFormProps<F>["reValidateMode"] = "onChange",
+export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
+  useStore: UseBoundStore<StoreApi<TStore>>,
+  storeSetter: (formValue: TFieldValues) => void,
+  storeSelector: (state: TStore) => TFieldValues,
+  {
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState,
+  }: UseFormReturn<TFieldValues>,
+  mode: UseFormProps<TFieldValues>["mode"] = "onSubmit",
+  reValidateMode: UseFormProps<TFieldValues>["reValidateMode"] = "onChange",
 ): void {
   const mutex = useRef(false);
 
@@ -82,27 +88,45 @@ export function useSyncRHFWithStore<T, F extends FieldValues>(
   }, [mode, reValidateMode, trigger, useStore]);
 }
 
-export function useFormWithStore<T, F extends FieldValues>(
-  useStore: UseBoundStore<StoreApi<T>>,
-  storeSetter: (values: F) => void,
-  storeSelector: (state: T) => F & Record<string, unknown>,
-  useFormOptions?: UseFormProps<F>,
-) {
+/**
+ * react-hook-form's useForm, but keeps the form state in sync with a zustand store
+ *
+ * This allows you to use react-hook-form with a zustand store, and have the form state be kept in sync with the store.
+ *
+ * By default, the form is initialized with the values from the store.
+ *
+ * @param useStore The zustand store that you're syncing with
+ * @param storeSetter The setter function for the portion of the store that you're syncing with (similar to the handleSubmit function)
+ * @param storeSelector The selector function for the portion of the store that you're syncing with (usually the defaultValues passed to useForm)
+ * @param useFormOptions The options passed to useForm
+ * @returns The return value of useForm from react-hook-form
+ */
+export function useFormWithStore<
+  TStore,
+  TFieldValues extends FieldValues,
+  TContext = any,
+>(
+  useStore: UseBoundStore<StoreApi<TStore>>,
+  storeSetter: (values: TFieldValues) => void,
+  storeSelector: (state: TStore) => TFieldValues,
+  useFormOptions?: UseFormProps<TFieldValues, TContext>,
+): UseFormReturn<TFieldValues, TContext> {
   useFormOptions = {
     defaultValues: deepCloneWithoutFunctions(
       storeSelector(useStore.getState()),
-    ) as DefaultValues<F>,
+    ) as unknown as DefaultValues<TFieldValues>,
     ...useFormOptions,
   };
+
   const { mode, reValidateMode } = useFormOptions;
-  const form = useForm<F>(useFormOptions);
+  const useFormReturn = useForm<TFieldValues, TContext>(useFormOptions);
   useSyncRHFWithStore(
     useStore,
     storeSetter,
     storeSelector,
-    form,
+    useFormReturn,
     mode,
     reValidateMode,
   );
-  return form;
+  return useFormReturn;
 }
