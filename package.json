@@ -1,6 +1,6 @@
 {
   "name": "zustand-rhf-sync",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Syncs the state of react-hook-form and zustand so that changes in one is updated in the other",
   "author": "lenwhite",
   "license": "MIT",
