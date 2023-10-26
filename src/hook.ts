@@ -86,7 +86,7 @@ export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
         mutex.current = false;
       }
     });
-  }, [mode, reValidateMode, trigger, useStore]);
+  }, [mode, reValidateMode, useStore]);
 }
 
 /**
