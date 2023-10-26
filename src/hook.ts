@@ -70,18 +70,19 @@ export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
           storeSelectorRef.current(state),
           storeSelectorRef.current(prevState),
         );
+        const shouldValidate = !!(
+          (!isSubmittedRef.current && mode !== "onSubmit") ||
+          (isSubmittedRef.current && reValidateMode !== "onSubmit")
+        );
         changes.forEach(([path, newValue]) => {
           setValueRef.current(path, newValue, {
             shouldDirty: true,
             shouldTouch: true,
-            shouldValidate: true,
+            // shouldValidate,
           });
-          if (!isSubmittedRef.current && mode !== "onSubmit") {
-            triggerRef.current(path);
-          } else if (isSubmittedRef.current && reValidateMode !== "onSubmit") {
-            triggerRef.current(path);
-          }
         });
+        // trigger validation after all values have been set
+        if (shouldValidate) triggerRef.current(changes.map(([path]) => path));
         mutex.current = false;
       }
     });
