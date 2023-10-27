@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import {
   DefaultValues,
   FieldValues,
+  Path,
   UseFormProps,
   UseFormReturn,
   useForm,
@@ -26,6 +27,8 @@ export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
     watch,
     setValue,
     trigger,
+    reset,
+    getValues,
     formState,
   }: UseFormReturn<TFieldValues>,
   mode: UseFormProps<TFieldValues>["mode"] = "onSubmit",
@@ -38,13 +41,17 @@ export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
   const storeSelectorRef = useRef(storeSelector);
   const isSubmittedRef = useRef(formState.isSubmitted);
   const setValueRef = useRef(setValue);
+  const resetRef = useRef(reset);
   const triggerRef = useRef(trigger);
+  const getValuesRef = useRef(getValues);
 
   storeSetterRef.current = storeSetter;
   storeSelectorRef.current = storeSelector;
   isSubmittedRef.current = formState.isSubmitted;
   setValueRef.current = setValue;
+  resetRef.current = reset;
   triggerRef.current = trigger;
+  getValuesRef.current = getValues;
 
   // syncs form to store
   useEffect(() => {
@@ -63,26 +70,43 @@ export function useSyncRHFWithStore<TStore, TFieldValues extends FieldValues>(
 
   // syncs store to form
   useEffect(() => {
-    return useStore.subscribe((state, prevState) => {
+    return useStore.subscribe((state) => {
       if (!mutex.current) {
         mutex.current = true;
         const changes = deepCompareDifferences(
           storeSelectorRef.current(state),
-          storeSelectorRef.current(prevState),
+          getValuesRef.current(),
         );
         const shouldValidate = !!(
           (!isSubmittedRef.current && mode !== "onSubmit") ||
           (isSubmittedRef.current && reValidateMode !== "onSubmit")
         );
         changes.forEach(([path, newValue]) => {
+          if (path === "") {
+            resetRef.current(newValue, {
+              keepDirty: true,
+              keepErrors: true,
+              keepTouched: true,
+            });
+            return;
+          }
           setValueRef.current(path, newValue, {
             shouldDirty: true,
             shouldTouch: true,
-            // shouldValidate,
           });
         });
         // trigger validation after all values have been set
-        if (shouldValidate) triggerRef.current(changes.map(([path]) => path));
+        if (shouldValidate) {
+          if (changes.some(([path]) => path === "")) {
+            triggerRef.current();
+          } else if (changes.length > 0) {
+            triggerRef.current(
+              changes
+                .map(([path]) => path)
+                .filter((path) => path !== "") as Path<TFieldValues>[],
+            );
+          }
+        }
         mutex.current = false;
       }
     });

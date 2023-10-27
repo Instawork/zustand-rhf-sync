@@ -68,7 +68,7 @@ function _deepCompareDifferences<
 export function deepCompareDifferences<T extends Record<string, unknown>>(
   state: T,
   prev: T,
-): [Path<T>, PathValue<T, Path<T>>][] {
+): [Path<T> | "", PathValue<T, Path<T>>][] {
   return _deepCompareDifferences(state, prev) as [
     Path<T>,
     PathValue<T, Path<T>>,
