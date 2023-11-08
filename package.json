@@ -7,7 +7,7 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lenwhite/zustand-rhf-sync.git"
+    "url": "git+https://github.com/instawork/zustand-rhf-sync.git"
   },
   "types": "dist/index.d.ts",
   "files": [
